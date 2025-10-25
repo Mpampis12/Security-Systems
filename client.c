@@ -41,25 +41,38 @@ SSL_CTX* InitCTX(void)
 {
     /* TODO:
      * 1. Initialize SSL library (SSL_library_init, OpenSSL_add_all_algorithms, SSL_load_error_strings)
-     * 2. Create a new TLS client context (TLS_client_method)
+*/
+     SSL_library_init();
+     OpenSSL_add_all_algorithms();
+     SSL_load_error_strings();
+
+/*
+     * 2. Create a new TLS client context (TLS_client_method)	
      * 3. Load CA certificate to verify server
      * 4. Configure SSL_CTX to verify server certificate
      */
-    SSL_CTX *ctx = NULL;
-
+    const SSL_METHOD *method = TLS_client_method();
+    SSL_CTX *ctx = SSL_CTX_new(methode);	
     if (ctx == NULL)
     {
         ERR_print_errors_fp(stderr);
         abort();
     }
 
-    return ctx;
-}
+   SSL_CTX_use_certificate_file(ctx,ca.crt,NULL); // SSL_CTX_load_verify_locations(ctx,ca.crt,NULL); DK  YET
+   SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER,NULL);
+//// ARXIKOPOIW SSL_LYBRARY,OPENSSLALGORITHM....
+////DIMIURGW CONTEX (TEMPLATE POU KRATAEI PROTOKOLA PISTOPOIITIKA ALGORITHOI KA EPALITHEYSH
+//LOAD VERIFY CERTF
+//SET  VERIFY  OT O CLIENT EPALITHEYEI TO CRTFC TOY SERVER
+
+
+
 
 void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile)
 {
     /* TODO:
-     * 1. Load client certificate using SSL_CTX_use_certificate_file
+     * 1. Load client certificat using SSL_CTX_use_certificate_file
      * 2. Load client private key using SSL_CTX_use_PrivateKey_file
      * 3. Verify that private key matches certificate using SSL_CTX_check_private_key
      */
