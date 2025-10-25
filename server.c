@@ -35,33 +35,57 @@ int OpenListener(int port) {
 
 SSL_CTX* InitServerCTX(void) {
     /* TODO:
-     * 1. Initialize SSL library (SSL_library_init, OpenSSL_add_all_algorithms, SSL_load_error_strings)
-     * 2. Create a new TLS server context (TLS_server_method)
-     * 3. Load CA certificate for client verification
-     * 4. Configure SSL_CTX to require client certificate (mutual TLS)
+    /* 1. Initialize SSL library (SSL_library_init, OpenSSL_add_all_algorithms, SSL_load_error_strings)
      */
-    SSL_CTX *ctx = NULL;
+	SSL_library_init();
+	OpenSSL_add_all_algoritms();
+	SSL_load_error_strings();
 
-    if (ctx == NULL) {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
-    return ctx;
+/* 2. Create a new TLS server context (TLS_server_method)
+    */
+	const SSL_METHOD *method=TLS_server_methos();
+	SSL_CTX *ctx = SSL_CTX_new(method);
+	
+	if(*ctx ==NULL){
+	ERROR_print_errors_fp(stderr);
+abort();
+	}
+
+ /* 3. Load CA certificate for client verification
+    */
+	IF(SSL_CTX_load_verify_locations(ctx,"ca.crt",NULL)<=0){
+	ERR_print_errors_fp(stderr);
+	abort():
 }
+
+ /* 4. Configure SSL_CTX to require client certificate (mutual TLS)
+     */
+	SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER,NULL);
+	RETURN ctx;  
+
+ }
 
 void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile) {
     /* TODO:
      * 1. Load server certificate using SSL_CTX_use_certificate_file
      * 2. Load server private key using SSL_CTX_use_PrivateKey_file
      * 3. Check that private key matches the certificate using SSL_CTX_check_private_key
-     */
+it is the same with client.c opote agi antegrapse ta pliz     
+*/
 }
 
 void ShowCerts(SSL* ssl) {
     /* TODO:
      * 1. Get client certificate (if any) using SSL_get_peer_certificate
-     * 2. Print Subject and Issuer names
+*/
+	X509 *certificate = SSL_get_peer_certificate(ssl);
+	if (certificate == NULL){
+	printf("No certif");
+	return;
+}
+    /* 2. Print Subject and Issuer names
      */
+	
 }
 
 void Servlet(SSL* ssl) {
