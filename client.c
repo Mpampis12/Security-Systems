@@ -51,7 +51,8 @@ SSL_CTX* InitCTX(void)
      * 3. Load CA certificate to verify server
      * 4. Configure SSL_CTX to verify server certificate
      */
-    const SSL_METHOD *method = TLS_client_method();
+    const SSL_METHOD *method = TLS_client_methodERR_print_errors_fp(stderr);
+        abort();();
     SSL_CTX *ctx = SSL_CTX_new(methode);	
     if (ctx == NULL)
     {
@@ -73,9 +74,23 @@ void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile)
 {
     /* TODO:
      * 1. Load client certificat using SSL_CTX_use_certificate_file
-     * 2. Load client private key using SSL_CTX_use_PrivateKey_file
-     * 3. Verify that private key matches certificate using SSL_CTX_check_private_key
+*/
+	if(SSL_CTX_use_certificate_file(ctx,CertFIle,NULL)<=0){
+	ERR_print_errors_fp(stderr);
+	abort();
+}
+/* 2. Load client private key using SSL_CTX_use_PrivateKey_file
+ */
+	if(SSL_CTX_use_PrivaeKey_file(ctx,KeyFIle,NULL)<=0){
+	ERR_print_errors_fp(stderr);
+	abort();
+}
+/* 3. Verify that private key matches certificate using SSL_CTX_check_private_key
      */
+	if(SSL_CTX_CHECK_private_key(ctx)=false){
+	ERR_print_errors_fp(stderr);
+	abort();
+
 }
 
 int main(int argc, char *argv[])
@@ -94,19 +109,29 @@ int main(int argc, char *argv[])
 
     /* TODO:
      * 1. Initialize SSL context using InitCTX
-     * 2. Load client certificate and key using LoadCertificates
+*/
+	ctx=Init_CXT();
+    /* 2. Load client certificate and key using LoadCertificates
      */
+	LoadCertificates(ctx,"client.crt,client.key);
 
     server = OpenConnection(hostname, port);
     ssl = SSL_new(ctx);
     SSL_set_fd(ssl, server);
 
     /* TODO:
-     * 1. Establish SSL connection using SSL_connect
-     * 2. Ask user to enter username and password
+     * 1. Establish SSL connection using SSL_connect*/
+	if(SSL_connect(ssl) ==-1)
+{
+	ERR_PRINT_ERRORS_FP(STDERR);
+
+} ELSE
+
+/*Ask user to enter username and password
      * 3. Build XML message dynamically
      * 4. Send XML message over SSL
-     * char username[64], password[64];
+    */ 
+	char username[64], password[64];
         printf("Enter username: ");
         scanf("%63s", username);
         printf("Enter password: ");
@@ -118,8 +143,14 @@ int main(int argc, char *argv[])
                  username, password);
 
         SSL_write(ssl, msg, strlen(msg));
-     * 5. Read server response and print it
+     /* 5. Read server response and print it
      */
+	char buffer[256];
+	int resonded_bytes = SSL_read(ssl,bud,sizeof(buf));
+	if(responded_bytes<0){
+	ERR_print_errors_fp(stderr);
+	}
+	printf("SErver response: %s",buffer);
 
     SSL_free(ssl);
     close(server);
