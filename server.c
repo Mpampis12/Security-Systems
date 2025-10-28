@@ -43,19 +43,19 @@ SSL_CTX* InitServerCTX(void) {
 
 /* 2. Create a new TLS server context (TLS_server_method)
     */
-	const SSL_METHOD *method=TLS_server_methos();
+	const SSL_METHOD *method=TLS_server_method();
 	SSL_CTX *ctx = SSL_CTX_new(method);
 	
 	if(*ctx ==NULL){
 	ERROR_print_errors_fp(stderr);
-abort();
+    abort();
 	}
 
  /* 3. Load CA certificate for client verification
     */
 	IF(SSL_CTX_load_verify_locations(ctx,"ca.crt",NULL)<=0){
 	ERR_print_errors_fp(stderr);
-	abort():
+	abort();
 }
 
  /* 4. Configure SSL_CTX to require client certificate (mutual TLS)
@@ -66,12 +66,24 @@ abort();
  }
 
 void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile) {
-    /* TODO:
+  /* TODO:
      * 1. Load server certificate using SSL_CTX_use_certificate_file
-     * 2. Load server private key using SSL_CTX_use_PrivateKey_file
-     * 3. Check that private key matches the certificate using SSL_CTX_check_private_key
-it is the same with client.c opote agi antegrapse ta pliz     
 */
+    if(SSL_CTX_use_certificate_file(ctx,CertFIle,NULL)<=0){
+    ERR_print_errors_fp(stderr);
+    abort();
+}
+/* 2. Load server private key using SSL_CTX_use_PrivateKey_file
+ */
+    if(SSL_CTX_use_PrivaeKey_file(ctx,KeyFIle,NULL)<=0){
+    ERR_print_errors_fp(stderr);
+    abort();
+}
+/* 3. Verify that private key matches certificate using SSL_CTX_check_private_key
+     */
+    if(SSL_CTX_CHECK_private_key(ctx)=false){
+    ERR_print_errors_fp(stderr);
+    abort();
 }
 
 void ShowCerts(SSL* ssl) {
@@ -85,6 +97,19 @@ void ShowCerts(SSL* ssl) {
 }
     /* 2. Print Subject and Issuer names
      */
+
+    X509_NAME *issuer = X509_get_issuer_name(clientCerts);
+    X509_NAME *subject = X509_get_subject_name(clientCerts);
+
+    char issuerBuffer[256];
+    char subjectBuffer[256];
+
+    X509_NAME_oneline(subject, subjectBuffer, sizeof(subjectBuffer));
+    printf("Subject: %s\n", subjectBuffer);
+    
+    X509_NAME_oneline(issuer, issuerBuffer, sizeof(issuerBuffer));
+    printf("Issuer: %s\n", issuerBuffer);
+
 	
 }
 
@@ -111,6 +136,9 @@ void Servlet(SSL* ssl) {
      * 2. Compare credentials to predefined values (e.g., "sousi"/"123")
      * 3. Send appropriate XML response back to client
      */
+
+    SSL_read(ssl,buf, (int)sizeof(buf));
+    
 
     int sd = SSL_get_fd(ssl);
     SSL_free(ssl);
