@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 	ctx=InitCTX();
     /* 2. Load client certificate and key using LoadCertificates
      */
-	LoadCertificates(ctx,"client.crt","client.key");
+	LoadCertificates(ctx,"rclient.crt","rclient.key");
 
     server = OpenConnection(hostname, port);
     ssl = SSL_new(ctx);
