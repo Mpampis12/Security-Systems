@@ -51,22 +51,22 @@ SSL_CTX* InitCTX(void)
      * 3. Load CA certificate to verify server
      * 4. Configure SSL_CTX to verify server certificate
      */
-    const SSL_METHOD *method = TLS_client_methodERR_print_errors_fp(stderr);
-        abort();();
-    SSL_CTX *ctx = SSL_CTX_new(methode);	
-    if (ctx == NULL)
-    {
-        ERR_print_errors_fp(stderr);
-        abort();
-    }
+    const SSL_METHOD *method = TLS_client_method();
+    SSL_CTX *ctx = SSL_CTX_new(method);
+    if (!ctx) {
+    ERR_print_errors_fp(stderr);
+    abort();
+}
 
-   SSL_CTX_use_certificate_file(ctx,ca.crt,NULL); // SSL_CTX_load_verify_locations(ctx,ca.crt,NULL); DK  YET
-   SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER,NULL);
+
+   //SSL_CTX_use_certificate_file(ctx,"ca.crt",SSL_FILETYPE_PEM); // SSL_CTX_load_verify_locations(ctx,ca.crt,NULL); DK  YET
+   //SSL_CTX_set_verify(ctx,SSL_VERIFY_PEER,NULL);
 //// ARXIKOPOIW SSL_LYBRARY,OPENSSLALGORITHM....
 ////DIMIURGW CONTEX (TEMPLATE POU KRATAEI PROTOKOLA PISTOPOIITIKA ALGORITHOI KA EPALITHEYSH
 //LOAD VERIFY CERTF
 //SET  VERIFY  OT O CLIENT EPALITHEYEI TO CRTFC TOY SERVER
-
+   return ctx;
+}
 
 
 
@@ -75,22 +75,23 @@ void LoadCertificates(SSL_CTX* ctx, char* CertFile, char* KeyFile)
     /* TODO:
      * 1. Load client certificat using SSL_CTX_use_certificate_file
 */
-	if(SSL_CTX_use_certificate_file(ctx,CertFIle,NULL)<=0){
+	if(SSL_CTX_use_certificate_file(ctx,CertFile,SSL_FILETYPE_PEM)<=0){
 	ERR_print_errors_fp(stderr);
 	abort();
 }
 /* 2. Load client private key using SSL_CTX_use_PrivateKey_file
  */
-	if(SSL_CTX_use_PrivaeKey_file(ctx,KeyFIle,NULL)<=0){
+	if(SSL_CTX_use_PrivateKey_file(ctx,KeyFile,SSL_FILETYPE_PEM)<=0){
 	ERR_print_errors_fp(stderr);
 	abort();
 }
 /* 3. Verify that private key matches certificate using SSL_CTX_check_private_key
      */
-	if(SSL_CTX_CHECK_private_key(ctx)=false){
+	if(SSL_CTX_check_private_key(ctx) != 1){
 	ERR_print_errors_fp(stderr);
 	abort();
 
+}
 }
 
 int main(int argc, char *argv[])
@@ -110,10 +111,10 @@ int main(int argc, char *argv[])
     /* TODO:
      * 1. Initialize SSL context using InitCTX
 */
-	ctx=Init_CXT();
+	ctx=InitCTX();
     /* 2. Load client certificate and key using LoadCertificates
      */
-	LoadCertificates(ctx,"client.crt,client.key);
+	LoadCertificates(ctx,"client.crt","client.key");
 
     server = OpenConnection(hostname, port);
     ssl = SSL_new(ctx);
@@ -123,9 +124,9 @@ int main(int argc, char *argv[])
      * 1. Establish SSL connection using SSL_connect*/
 	if(SSL_connect(ssl) ==-1)
 {
-	ERR_PRINT_ERRORS_FP(STDERR);
+	ERR_print_errors_fp(stderr);
 
-} ELSE
+} else {
 
 /*Ask user to enter username and password
      * 3. Build XML message dynamically
@@ -145,13 +146,13 @@ int main(int argc, char *argv[])
         SSL_write(ssl, msg, strlen(msg));
      /* 5. Read server response and print it
      */
-	char buffer[256];
-	int resonded_bytes = SSL_read(ssl,bud,sizeof(buf));
+	char buf[256];
+	int responded_bytes = SSL_read(ssl,buf,sizeof(buf));
 	if(responded_bytes<0){
 	ERR_print_errors_fp(stderr);
 	}
-	printf("SErver response: %s",buffer);
-
+	printf("Server response: %s",buf);
+}
     SSL_free(ssl);
     close(server);
     SSL_CTX_free(ctx);
