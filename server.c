@@ -10,12 +10,12 @@
 
 #define FAIL -1
 
-char allowedUsername[64] = "Sousi";
-char allowedPassword[64] = "123";
-char allowedName[64] = "sousi.com"; 
-char allowedYear[64] = "1.5";
-char allowedBlogType[64] = "Embedede and c c++";
-char allowedAuthor[64] = "John Johny"; 
+const char allowedUsername[64] = "Sousi";
+const char allowedPassword[64] = "123";
+const char allowedName[64] = "sousi.com"; 
+const char allowedYear[64] = "1.5";
+const char allowedBlogType[64] = "Embedede and c c++";
+const char allowedAuthor[64] = "John Johny"; 
 
 int OpenListener(int port) {
     int sd;
